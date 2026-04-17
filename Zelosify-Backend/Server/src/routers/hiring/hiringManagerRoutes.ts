@@ -2,7 +2,7 @@ import { Router, type RequestHandler } from "express";
 import { authenticateUser } from "../../middlewares/auth/authenticateMiddleware.js";
 import { authorizeRole } from "../../middlewares/auth/authorizeMiddleware.js";
 import { fetchData } from "../../controllers/controllers.js";
-import hiringManagerJobRoutes from "./hiringManagerJobRoutes.js";
+//import hiringManagerJobRoutes from "./hiringManagerJobRoutes.js";
 import hiringContractRoutes from "./hiringContractRoutes.js";
 
 const router = Router();
@@ -30,7 +30,7 @@ router.get(
   }) as RequestHandler
 );
 
-router.use("/jobs", hiringManagerJobRoutes);
+//router.use("/jobs", hiringManagerJobRoutes);
 
 // [MODIFY - SAFE INTEGRATION]
 // Reason: Mounting new contract management routes without altering existing logic
