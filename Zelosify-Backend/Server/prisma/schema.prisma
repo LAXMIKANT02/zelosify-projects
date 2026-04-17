@@ -33,6 +33,9 @@ model User {
   // Relation to tenant
   tenant          Tenants?     @relation(fields: [tenantId], references: [tenantId])
 
+  openings        Opening[]
+  uploadedProfiles HiringProfile[] @relation("Uploader")
+
   @@unique([email, provider])
   @@index([tenantId])
 }
@@ -44,6 +47,8 @@ model Tenants {
   updatedAt           DateTime  @updatedAt
 
   users               User[]
+  openings            Opening[]
+  hiringProfiles      HiringProfile[]
 }
 
 enum AuthProvider {
@@ -62,4 +67,56 @@ enum Role {
   PROCUREMENT_MANAGER
   RESOURCE_MANAGER
   VENDOR_MANAGER
+}
+
+// [MODIFY - REQUIRED & JUSTIFIED]
+// Reason: Required by assignment, not present in schema
+
+model Opening {
+  id              String   @id @default(uuid())
+  title           String
+  description     String
+  location        String
+  experienceMin   Int      @default(0)
+  experienceMax   Int      @default(10)
+  
+  tenantId        String
+  tenant          Tenants  @relation(fields: [tenantId], references: [tenantId])
+  
+  hiringManagerId String
+  hiringManager   User     @relation(fields: [hiringManagerId], references: [id])
+  
+  profiles        HiringProfile[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([tenantId])
+}
+
+model HiringProfile {
+  id                      String   @id @default(uuid())
+  s3Key                   String
+  status                  String   @default("PENDING") // PENDING, SHORTLISTED, REJECTED
+  
+  recommended             Boolean?
+  recommendationScore     Float?
+  recommendationConfidence Float?
+  recommendationReason    String?
+  recommendationLatencyMs Int?
+  
+  openingId               String
+  opening                 Opening  @relation(fields: [openingId], references: [id])
+  
+  tenantId                String?
+  tenant                  Tenants? @relation(fields: [tenantId], references: [tenantId])
+  
+  uploadedBy              String
+  uploader                User     @relation("Uploader", fields: [uploadedBy], references: [id])
+  
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  
+  @@index([openingId])
+  @@index([tenantId])
 }
